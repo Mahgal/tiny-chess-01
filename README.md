@@ -1,10 +1,12 @@
 # tiny-chess-01
 
-[![make.fun](https://make.fun/badge/tiny-chess-01)](https://make.fun/bounty/tiny-chess-01)
-[![make.fun](https://make.fun/badge/tiny-chess-01/submissions)](https://make.fun/bounty/tiny-chess-01)
-[![make.fun](https://make.fun/badge/tiny-chess-01/prize)](https://make.fun/bounty/tiny-chess-01)
+[![make.fun · tiny-chess-01](https://make.fun/badge/tiny-chess-01.svg)](https://make.fun/bounty/tiny-chess-01?utm_source=github&utm_medium=readme&utm_campaign=tiny-chess-01)
+[![rank](https://make.fun/badge/tiny-chess-01/Mahgal/tiny-chess-01/rank.svg)](https://make.fun/bounty/tiny-chess-01/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=tiny-chess-01)
+[![reward](https://make.fun/badge/tiny-chess-01/Mahgal/tiny-chess-01/reward.svg)](https://make.fun/bounty/tiny-chess-01?utm_source=github&utm_medium=readme&utm_campaign=tiny-chess-01)
 
-A tiny chess engine in a single 4 KB Python file — **4,085 bytes**, standard library only.
+Built for the make.fun bounty.
+
+A tiny chess engine in a single 4 KB Python file — **4,096 bytes**, standard library only.
 
 Play it via the make.fun competition: https://make.fun/bounty/tiny-chess-01
 
@@ -21,7 +23,7 @@ Referral: https://make.fun/r/6d6dq8sh
 
 ## Files
 
-- `main.py` — the whole engine (4,085 bytes)
+- `main.py` — the whole engine (4,096 bytes)
 - `README.md` — this file
 - `LICENSE` — MIT
 
