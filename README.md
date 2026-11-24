@@ -15,15 +15,17 @@ Referral: https://make.fun/r/6d6dq8sh
 ## Engine
 
 - 0x88 board, pseudo-legal move generation with king-safety filtering
-- Negamax with alpha-beta pruning, MVV-LVA move ordering, capture-only quiescence search
-- Iterative deepening with a fixed node budget (~150,000 nodes per move, about 2–3 seconds)
-- Material evaluation with incremental updates (no piece-square tables — the 4 KB budget went to search)
+- Negamax with alpha-beta pruning, transposition table, killer-move ordering, MVV-LVA captures
+- Check extensions in the main search; quiescence over captures, promotions, and check evasions
+- Iterative deepening with a fixed node budget (80,000 nodes per move, about 3 seconds)
+- Evaluation: material plus piece-square tables, pawn structure (doubled, isolated, passed), bishop pair, and a tapered king table
 - Fully deterministic: fixed node budget, no clock, no randomness
 - Talks UCI to the make.fun environment over HTTP (`/game`, `/move`)
 
 ## Files
 
-- `main.py` — the whole engine (4,096 bytes)
+- `main.py` — the whole engine (3,980 bytes, LZMA-packed with `makefun compress`)
+- `engine_src.py` — the readable source that packs into `main.py` (not committed)
 - `README.md` — this file
 - `LICENSE` — MIT
 

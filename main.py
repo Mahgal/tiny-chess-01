@@ -1,205 +1,2 @@
-import os,sys,json,urllib.request as u
-def T(p,d):
- try:return json.loads(u.urlopen(E+p,json.dumps(d).encode()).read())
- except Exception:return{}
-E=os.environ.get("MAKEFUN_ENV_URL")or sys.exit(1)
-V=(0,100,320,330,500,900,0)
-U=(-33,-31,-18,-14,14,18,31,33)
-M=(-17,-15,15,17)
-N=(-16,-1,1,16)
-O=M+N
-ak=[U,M,N,O,O]
-X={0:13,7:14,4:12,112:7,119:11,116:3}
-b=[0]*128
-h=1;v=0;w=-1;W=0;B=4;C=116
-P=[]
-def al(f):
- global h,v,w,W,B,C
- a=f.split()
- b[:]=[0]*128
- h=1-2*(a[1]=='b')
- v=sum(1<<'KQkq'.index(c)for c in a[2]if c in'KQkq')
- w=Y(a[3])if a[3]!='-'else-1
- W=0
- k=112
- for c in a[0]:
-  if c=='/':k-=24
-  elif c.isdigit():k+=int(c)
-  else:
-   p='PNBRQK'.index(c.upper())+1
-   if c.islower():p=-p
-   b[k]=p
-   W+=V[abs(p)]*p//abs(p)
-   if p==6:B=k
-   elif p==-6:C=k
-   k+=1
- P.clear()
-def K(k,l):
- for d in(-15*l,-17*l):
-  s=k+d
-  if not(s&0x88)and b[s]==l:return 1
- for d in U:
-  s=k+d
-  if not(s&0x88)and b[s]==l*2:return 1
- for d in O:
-  s=k+d
-  if not(s&0x88)and b[s]==l*6:return 1
-  while not(s&0x88):
-   p=b[s]
-   if p:
-    if p==l*5 or(p==l*3 and d in M)or(p==l*4 and d in N):return 1
-    break
-   s+=d
- return 0
-def Q(l):return B if l>0 else C
-def Z():
- x=[]
- for f in range(128):
-  if f&0x88:continue
-  p=b[f]
-  if not p or(p>0)!=(h>0):continue
-  t=abs(p)
-  if t==1:
-   d=16*h
-   n=f+d
-   if not(n&0x88)and not b[n]:
-    x.append(f|(n<<7)|(81920 if(n>>4)%7==0 else 0))
-    if(f>>4)==(7-5*h)//2:
-     aa=f+2*d
-     if not b[aa]:x.append(f|(aa<<7))
-   for am in(15*h,17*h):
-    n=f+am
-    if n&0x88:continue
-    q=b[n]
-    if q and(q>0)!=(h>0):
-     x.append(f|(n<<7)|(81920 if(n>>4)%7==0 else 0))
-  else:
-   for d in ak[t-2]:
-    s=f+d
-    while not(s&0x88):
-     q=b[s]
-     if not q or(q>0)!=(h>0):x.append(f|(s<<7))
-     if q or t%4==2:break
-     s+=d
-   if t==6:
-    o=60-56*h
-    for y in(1,-1):
-     an=(2-(y>0))*(1 if h>0 else 4)
-     G=(o&~15)+7*(y>0)
-     if v&an and b[G]==4*h and not b[o+y]and not b[o+2*y]and(y>0 or not b[o-3])and not any(K(s,-h)for s in(o,o+y,o+2*y)):x.append(o|((o+2*y)<<7))
- return x
-def R(m):
- global h,v,w,W,B,C
- f=m&127;t=(m>>7)&127;z=(m>>14)&7
- p=b[f];A=b[t];D=t
- if abs(p)==1 and t==w and not A:
-  D=t-16*h;A=b[D]
- P.append((p,A,D,v,w,W,h))
- ab=z*h if z else p
- W+=h*((V[abs(A)]if A else 0)+V[abs(ab)]-V[abs(p)])
- b[f]=0;b[t]=ab
- if D!=t:b[D]=0
- if abs(p)==6:
-  if h>0:B=t
-  else:C=t
- if abs(p)==6 and abs(t-f)==2:
-  if t>f:G=f+3;ac=f+1
-  else:G=f-4;ac=f-1
-  r=b[G]
-  W+=h*30
-  b[ac]=r;b[G]=0
- v&=X.get(f,15)&X.get(t,15)
- w=(f+t)//2 if abs(p)==1 and abs(t-f)==32 else-1
- h=-h
-def H(m):
- global h,v,w,W,B,C
- p,A,D,ao,ap,aq,ad=P.pop()
- f=m&127;t=(m>>7)&127
- b[f]=p;b[t]=0
- if A:b[D]=A
- if abs(p)==6:
-  if ad>0:B=f
-  else:C=f
- if abs(p)==6 and abs(t-f)==2:
-  if t>f:b[f+3]=b[f+1];b[f+1]=0
-  else:b[f-4]=b[f-1];b[f-1]=0
- v,w,W,h=ao,ap,aq,ad
-L=10**5
-I=[0]
-ae=[150000]
-def af(a,j):
- I[0]+=1
- if I[0]>ae[0]:raise TimeoutError
- e=W*h
- if e>=j:return j
- if e>a:a=e
- for m in Z():
-  t=(m>>7)&127
-  if not b[t]:continue
-  R(m)
-  if K(Q(-h),h):
-   H(m);continue
-  s=-af(-j,-a)
-  H(m)
-  if s>=j:return j
-  a=max(a,s)
- return a
-def ag(a,j,d,ah):
- I[0]+=1
- if I[0]>ae[0]:raise TimeoutError
- if d<=0:return af(a,j)
- x=Z()
- S=[]
- for m in x:
-  t=(m>>7)&127
-  s=0
-  if b[t]:s=V[abs(b[t])]*10-V[abs(b[m&127])]
-  S.append((-s,m))
- S.sort()
- F=-L;J=0
- for _,m in S:
-  R(m)
-  if K(Q(-h),h):
-   H(m);continue
-  J+=1
-  s=-ag(-j,-a,d-1,ah+1)
-  H(m)
-  F=max(F,s);a=max(a,s)
-  if a>=j:break
- if not J:
-  if K(Q(h),-h):return-L+ah
-  return 0
- return F
-def ar(m):
- f=m&127;t=(m>>7)&127;z=(m>>14)&7
- s=chr(f%8+97)+str((f>>4)+1)+chr(t%8+97)+str((t>>4)+1)
- if z:s+="nbrq"[z-2]
- return s
-def Y(u):
- f,t=[ord(u[i])-97+(int(u[i+1])-1)*16 for i in(0,2)]
- z=0
- if len(u)==5:z="nbrq".index(u[4])+2
- return f|(t<<7)|(z<<14)
-def at(J):
- I[0]=0
- F=J[0]
- try:
-  for d in range(64):
-   a=-L;j=L;ai=F
-   for m in J:
-    R(m)
-    s=-ag(-j,-a,d-1,1)
-    H(m)
-    if s>a:a=s;ai=m
-   F=ai
- except TimeoutError:
-  pass
- return F
-while True:
- g=T("/game",{})
- if"game"not in g:break
- al(g["fen"])
- aj=g.get("legal_moves")
- if not aj:break
- au=at(list(map(Y,aj)))
- T("/move",{"game":g["game"],"move":ar(au)})
+#coding:l1
+import lzma;exec(lzma.decompress('\0@\0\0ò8\0\0\0\0\0\0\0ˆH\0œ^İ%âœd^‹“Ğe$qx·€şì`öªKŞì/»øv¼v©êVS°İúÙ×ìÅBşìºzsL~cÅŒb6˜¹tš¶wÍ>Í\'¼9)1’É:^¡\rÃ]‘¢iQ€2¼HË¯V%	¼¢Xá[ó–%L”ëŞÅ²TÂÈSw“·áãû46ûXò@AñmSrjÈŠb“©Š]m¤SÁGÈø«ëuûh¤ae]‹cã€º“\n¹¦Ü¸R‰À¥íŠ/3`7ú1ãsh?S¼mô5\\ú¶ŠĞÄÇ©€İ°ˆzNZıî/ys`Œ½­Õ	¦ "µ}[NæÑ{-$¼ÔÌ‡Nw`¤èÕ8ôÇ;Ë>ò$oÂAïy2Ì‰†ÓG_­ã§Mèòˆİ!ª}9Tï¢ÛvkÂÂ$ç±Rë ä­hU¹œ¾œêˆ¹ÖŒ`F“”wç+VèQÙü‘”øÃø5Âq;×º€›µ¾¦+İ{¶>“ò3‰ïn2X“óú¥8ZhpIcª»„Tö®¡3¤Uˆ	Z¤á§³)|©Y²GğEìyq\'J¢îÕw_%ŒocZ–Ò^Ì`~=„AæY3»T_8)°D=9¶ ¶€>ªi~JrÎNækÕ]1æ8ûÑlëJM==StN¤ÙZ$ÔDâXÎˆïğQeåÌvŞêâ«ß8É“•ÁjŞ¥REõµŒÈ	Öæ\'r%‡Ò£WBéÔ*:‚u6@¹£zRûÑ€å?öÎ>ü+ìt‚§o™&ÓÜGĞâøÓ2ÚJ«˜°´ÎXÀAË–ï¦ğ¯ò¬Ùê\'IÙ»£ÒÉ"2‡ÁU#1y4hJ”¨/ÛôVz”½ÿ!zÕ¨è¡ª1­$¯ƒVÖ¯sN…Š°ô·OO°ãÍì±p™\'X\n0!„IáéÅÊ0w‚{Uèr\n´>ğm-`…úHM,^•xä8è„Åé¢ZŒ­4oèT\\J0í`…ÜµøïOæVæùáBÊê„‡’AÒI¸*Û£€·6(1{KÉ°…šÖHƒİêÇä3wÖ€rÛ\\Qxp¢mŒ1RöPÖö Í·{¸*\\3ŠEŞ#‚3\r¦ã»Ÿ²+RDUÔ“üéWÙå{?Gõ¦À‡QÉ}]»æföJ–ç×€O+Ù¥î]“=k6n•Kñ,×1¬¯½Y=?m¢f}BìsÂºx½vÒOP{(;uYúéèâ‹§4‘Z»‰$\nuêî8•Ÿù*t¬ÅC0a›Ó—ÃµÉJÕ(	Üòe`Qà˜ØñÚÂßa+Òx\0¶–®¨®O=f*æi;©¥â¤ñÏÔğ¦ÃbÂ\n\0·ö(½\r\n†t—\róè]á†à<|$?Ì…Ê6\r­¤(s	º/g°Ùºö€ºíÇÖ­dú˜ÚNÃ…ÓiPÿ^Úe¡Êr¸å(‹S³êÎ *ñ—¹>DÉ…XBÄª£’ÏîÏË5ğOÜôZ0\\ğÈ¤«SŸû G\0ùt\n*-áâŒ?j+ŞşÈ?ÅnÛÛ0¨œ!Uà…ÅãÜ+¤Ìh‘˜mr¾F\0D—	/K^g+€Ô*Z[(–”®Ç¶ÿ±JÒK8^å-Šl’F£Ş;ÖKPkFÜ<!ßæñmÁ›–¼LõnD@°ÖøE.ap•¢CâÓ~eK6*°BwSn\0¦q ˆ•\'ä¢*š:s–òk9KœŒtìÎğ/­²<ÿUë„Æú#\n"\\1»<f2åÖ`>É“Ú2©r±[Xÿ>J_}´Îƒ»HÔEnEÜâT „o\n‹l‡z#ƒÃŸäd òåíîŠuñ¦Ñ–Ñ¦«6ß4?ZûW\\>¦´tSRm!R Ø–¢<²ƒè&r\0“É’İÖ–Âöü‡ø9&pk	Ù‹ä¸ÚŸÆä‡•²iôüuœEÆ““KagxÅIç³P\0mÊ6”¾õ®ôdƒk.†¤÷èÉƒtå<n@~FÒNk(úVU®6ğ°.WU½ò€7 #îÂ¸<CKAˆRõÍg<{·*‘¥ú$Ê\0Ò¸²WDÿ·³Q`³yÂT*û‚ÀP;Ü3@M\'çƒşt,ns{AMúœ5ærf“,³‹cÎuÅ³iúˆÖòú\'õ=\nÜ\\¶Stô%¡Ë˜wsdÅÈõF×šå×…ŞÅ©¨u`ÑàŸğ±êuQœæìŒK2#ºêI»æ˜âÖ|ÿ³®Œº‡scZ¯|9ú/‹•q©5c[¥/[ 4¹¡›_÷hòìcV\n6°hĞ}™sX+¹-çÅq¼HEî5Ši¢\'K÷ës­_\'Ip:™‘ôJÆÑ…Ò“ÔP1Oñûísóø¤÷×1)õv^iO]Ã™à$¸«óÂ\\?¾e8>¦„LT|Á!€,zÁ\nó±c•Û„sÉ£°*Ú\0§Z¾w_PCöÏ‰ø:ër<Y}&64Ÿ4ªŞ½6í•ÏC­›”Ÿªê1\rÓˆJ5”ç©0áĞf³ûÏ»d\n0>^ğt7DÀÀÊ…G¾Ãµ&ıó/ØDÑÈ°‹uÜ³ä”ö«Ù¥Ø¾×”#çù/O$¬Ñ§szb<v<\\=sä!\\LŸŒ‰¥”*å±mbAcø[Yğ>ö…‹	û›[PËŸE0›6K³V¶]>5 ™ˆ™"°ÒqÇúw„h}­ì•ôp´FÃ½væ1Pú&Ä¸Ş¼½ãSN£è¶‘Ø“L™ÔJAÓ&²çjbB¬O±#cRbÒÏşO•doG‘/uLÇ¾ú-ÍTw«GK|€§ÿ5…ÄxF²RhbÒ²æŠıè¹e¤å/ÎõªôHøR}ŞC-úÀCr¢?uä(kÅK ¦Ì9Sa†xÖ™âÌevò	ò\nLV[mŠ¿àŞ ˆ\r±«=ÒâÁëKZÔQ»œ>¼ºU!-‘[\0íÙAtæ8ÈbÖP¶f<§¯ÅËó®ˆ;üw‰Ó+mÖ£yF›é¦ø}ğ%õpïV¸ú¦°ˆæ(ò™ê}mÚÓ…ôDÈÜÁÇÌ?º•µ•‘÷œ¯>KW9ã‚lğ[û\nÇbWı`dt©Ò«•“Ø‘3Ë8ÈÜ©óÖ¾¬µ’)c_‰b=P—©¹\nĞ\0H÷·kæ?Æ-Aaå7Ñ–<9UÅj)ãÀÃpVã›æ0[÷Ï2`8<Xû^õ³Úßá‹¼…Ï)÷tÒ•—üJôsê1ñ1z¸ÙÁ<ğY\\"ga÷®±«†½¯#/™³ßº\'ÄÁıqVõŠä‚R`ÒG•2ÍÀ4gLL.´ÜÖŞœ¼ÿµª®Ày¸øÖÈ]¦Êš=ß{¡ëğ™ç‹0éˆy³!]Ü]ÏŞ(õ´[wîh`0lØ«¿ˆùo³‰²ÒÒ,–d­uqŒ˜%$"t5š£›\n‰gê9¹Š±éVÂèá$<\'.™¼1Ü[è\0œH£×ˆ*$ä§mè™9èu9MÊØSY3ùCe$òìàyş½ÂÕ–î*×ğ²G÷YqËP¥*8;	İÃÓ-/‚óAxêÚôB×Á¶U½&—&Ê¹è`¼pIÿáñ„ñ·õ¦º”©QÎà1sœë‡,])™\nQğNÿÕºKæwë}LÙnmqZÉ£›eg8ğ>Ù™9íß©.00Ó\\YC,Ö<§Oò?GÈíM_v¦SBAßT¹4âæº¦‚ó²:÷=fáúºÙ«jbgOğ7J¨‰ôw] —é]ÜóÄÔ‡@|¯©^&·~]ú=ğV³…Ï-Å©Õˆæ°ÖewÃÃM+Ÿ„ú\'#FªõïGJ\0-ÒZ9ë£IAQøå`¿¦Ô‹ÂÈ9¾«ßßHÚ#InØşØÜ~Ğ‘¼}\'O|Ô•˜xõøêHk›Ì;okFËÊ\nØaÑ5K)Û@÷h!ûéá¢ÈG±¥4··İC†a»;sAé¿|5e	Î5µ-/Ê[ÖŞWÜå/-R{u\'oòår…%aß¢ŸóšL^Ğ-ë!í;ªZ?a‰o…{“V±§¬¥\0Øe=ÔÁ,ò2a5JB?íŸAu^âMÅ*Æ­Å}ógu¼Ò H¯—N&fİ\rD~‡´GÊãÕÏ„„\'Ğu#Óf+)ñÂÎAÎÙùà‚íƒ¸Ğsı³EßNx_$J Ëšù{\n@L&u(dÆO<÷y/H#“[ˆ¼¼·¢Iá¥mJé‰hœVÂ8~Šù7‘˜£/-dÃè¿Pj†‘ÏuójnàÊ}2‘şó|ù/`é“¤c¹@O\'NÚ$ƒıdÒ–ÒBå_Ï¨ê™h^ëg¯¯DÈëO¤?ªNÜˆOÜÊ\nå.G›‚¿	òÎ"…‡ç]£:˜Cş™±j+pH‹N	ãd´Ó¥o«¢I5.‚g÷ÃÕˆNò¢*¡?Í|K¹LÆàz3=ñdı2Æ\'Î„4²¯à)OŞ|^È’Ğ4¸»Ê§øv%Ò.\'2Á“S$N¸hİéƒ®Ü@A1v§Î¨š}¨²lüí­9#àV9ãÜ{µˆx}ĞäOYì;~y\\˜·`oØ5èì®™Ğ•š§~¨ª¥¿<‰"şÔ¥Ö=’‘ë^ã?Ûöö‚˜ÅÒU”yHÁ»OIêUûİSÚHoöşº1\x007ÃñÓÖ~]Wpg÷;Øƒ!…äõ"ë]=İ±O`D[ ÆjL*jÏİ7dŸŒ{¾\r(;).Óƒ¼Af*’Å,SQ‡áª;BÜÅù‚´§®]³4ªğÅ\'›QÆ;¯º_Í±Ú-…EÀ3¶’Sgé°œ6úgÒ¿ıÙDúx@tü\0`|£ñœ¾ÛŞ>MDÛÚU-Ê+…,= í}"ÙX‡|İè««“‹ù­–LZ€Ù¶Ÿ¦“<o’8 ÎËÉ—|–›5)	ÄûhB(Ú1ù"ûŒke9´"n:;¢µØŞÄ'.encode('l1')))
